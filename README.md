@@ -1,8 +1,9 @@
 # myreedsolomon
 
-一个简单的Reed-Solomon纠删码的编码与解码实验<br>
-* 依赖于[klauspost/reedsolomon](https://pkg.go.dev/github.com/klauspost/reedsolomon@v1.9.12)库。
-* 部分源码参考[博客](https://cloud.tencent.com/developer/article/1829995)。
+* 《大数据存储技术》课程作业。
+* 一个简单的Reed-Solomon纠删码的编码与解码实验。
+* 依赖于[reedsolomon](https://pkg.go.dev/github.com/klauspost/reedsolomon@v1.9.12)库。
+* 源码参考[博客](https://cloud.tencent.com/developer/article/1829995)和[klauspost/reedsolomon](https://github.com/klauspost/reedsolomon)。
 
 ## 项目文件结构
 ```

@@ -1,37 +1,9 @@
 //go:build ignore
 // +build ignore
 
-// Copyright 2015, Klaus Post, see LICENSE for details.
-//
-// Stream decoder example.
-//
-// The decoder reverses the process of "stream-encoder.go"
-//
-// To build an executable use:
-//
-// go build stream-decoder.go
-//
-// Simple Encoder/Decoder Shortcomings:
-// * If the file size of the input isn't dividable by the number of data shards
-//   the output will contain extra zeroes
-//
-// * If the shard numbers isn't the same for the decoder as in the
-//   encoder, invalid output will be generated.
-//
-// * If values have changed in a shard, it cannot be reconstructed.
-//
-// * If two shards have been swapped, reconstruction will always fail.
-//   You need to supply the shards in the same order as they were given to you.
-//
-// The solution for this is to save a metadata file containing:
-//
-// * File size.
-// * The number of data/parity shards.
-// * HASH of each shard.
-// * Order of the shards.
-//
-// If you save these properties, you should abe able to detect file corruption
-// in a shard and be able to reconstruct your data if you have the needed number of shards left.
+/*
+参考 https://github.com/klauspost/reedsolomon/blob/master/examples/stream-decoder.go
+*/
 
 package main
 
