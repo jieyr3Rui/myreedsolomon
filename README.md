@@ -50,7 +50,7 @@ File split into 4 data + 2 parity shards.
 ```
 
 ### 随机删除
-模拟存储过程的随机性，随机删除一些`shards`。
+模拟存储/通信过程的数据丢失，随机删除一些`shards`。
 ```
 $ rm shards/example_file.1 shards/example_file.4
 $ ls shards/
