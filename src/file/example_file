@@ -1,0 +1,2 @@
+Abstract
+We propose a framework for tightly-coupled lidar inertial odometry via smoothing and mapping LIO-SAM, that achieves highly accurate, real-time mobile robot trajectory estimation and map-building.
