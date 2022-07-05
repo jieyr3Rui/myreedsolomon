@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>生成表达式</title>
+</head>
+<body>
+<input type="text" id="num">
+<div id="powstr"></div>
+<div id="result"></div>
+<script>
+
+  //GF(256) 对数反对数表(借用qrCode.js)
+  let QRMath = {
+    glog: function (n) {
+      if (n < 1) {
+        throw new Error("glog(" + n + ")");
+      }
+      return QRMath.LOG_TABLE[n];
+    },
+    gexp: function (n) {
+      while (n < 0) {
+        n += 255;
+      }
+      while (n >= 256) {
+        n -= 255;
+      }
+      return QRMath.EXP_TABLE[n];
+    },
+    EXP_TABLE: new Array(256),//α 表达式  对数
+    LOG_TABLE: new Array(256)//真数
+  };
+  for (let i = 0; i < 8; i++) {
+    QRMath.EXP_TABLE[i] = 1 << i;// 1 2 4 8  16 32 64 128
+  }
+  for (let i = 8; i < 256; i++) {
+    QRMath.EXP_TABLE[i] = QRMath.EXP_TABLE[i - 4] ^ QRMath.EXP_TABLE[i - 5] ^ QRMath.EXP_TABLE[i - 6] ^ QRMath.EXP_TABLE[i - 8];
+    //8:  16 ^ 8 ^ 4 ^ 1  29
+    //9: 32 ^ 16 ^ 8 ^ 2  58
+  }
+  for (let i = 0; i < 255; i++) {
+    QRMath.LOG_TABLE[QRMath.EXP_TABLE[i]] = i;
+  }
+
+
+  /**
+   * 生成多项式 (α^0x-α^0)(α^0x-α^1) => α^0x^2+α^25x^1+α^1x^0  这里的^ 表示指数
+   *
+   * 常数项指代 alpha 表达式(这个应该叫对数吧，整懵了)
+   *
+   * @param n 生成多项式最高阶  也就是纠错的码字数
+   */
+  function polynomial(n) {
+    let resultPolynomial;// 表达式结果
+    let curr;
+    let inputStr = '';
+    for (let i = 0; i < n; i++) {
+      //自定义表达式表示方式   key 表示x的阶数, value 表示x对应系数的反对数表达式的阶数即 α的指数
+      curr = {1: 0, 0: i};
+
+      //原乘法表达式字符串
+      inputStr +=`(α<sup>${curr[1]}</sup>x<sup></sup>-α<sup>${curr[0]}</sup>)`;
+      resultPolynomial = i == 0 ? curr : mergePolynomial(resultPolynomial, curr);
+    }
+    //多项式结果字符串
+    let result = Object.keys(resultPolynomial).sort((a, b) => b - a).map(d => {
+      return `α<sup>${resultPolynomial[d]}</sup>x<sup>${d}</sup>`
+    }).join('+');
+
+    el_powstr.innerHTML = inputStr;
+    el_result.innerHTML = result;
+  }
+
+  //合并两个多项式
+  function mergePolynomial(left, right) {
+    let leftKeys = Object.keys(left).map(d => +d),
+      rightKeys = Object.keys(right).map(d => +d),
+      leftLen = leftKeys.length,
+      rightLen = rightKeys.length,
+      resultObj = {},
+      kSum;// 表示各阶x 的常数项和
+    for (let i = 0; i < leftLen; i++) {
+      for (let j = 0; j < rightLen; j++) {
+        kSum = leftKeys[i] + rightKeys[j];
+        //判断是否需要合并同类项
+        if (resultObj[kSum] != null) {
+          //合并同类项需要对常数项进行XOR ; 常数项相乘只相加常数项指数并模255,不过QRMath 中做了取模处理，这里不再处理
+          resultObj[kSum] = QRMath.glog(QRMath.gexp(resultObj[kSum]) ^ QRMath.gexp(left[leftKeys[i]] + right[rightKeys[j]]))%255;
+        } else {
+          resultObj[kSum] = (left[leftKeys[i]] + right[rightKeys[j]])%255
+        }
+      }
+    }
+    return resultObj;
+  }
+
+  let el_num = document.getElementById('num');
+  let el_powstr = document.getElementById('powstr');
+  let el_result = document.getElementById('result');
+
+  el_num.addEventListener('change',function(){
+    polynomial(this.value||7);
+  })
+
+</script>
+</body>
+</html>
+
+
