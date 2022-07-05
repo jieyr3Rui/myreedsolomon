@@ -237,7 +237,7 @@ public:
                 GFM sgfm = adjoint.select_rows(sl, 1);
                 sgfm.mul_row(0, adjoint.M[k][i] / adjoint.M[i][i]);
                 // cout << "sgfm k=" << k << endl;
-                sgfm.show();
+                // sgfm.show();
                 adjoint.add_row(k, &sgfm);
 
             }
