@@ -200,40 +200,54 @@ public:
                 if(i==j){GF one(1); adjoint.M[i][N+j] = one;}
             }
         }
+
+        cout << "adjoint" << endl;
         adjoint.show();
+
         GF zero(0); GF one(1);
-        cout << "add 1" << endl;
-        adjoint.show();
+
         for(int i=0; i<N; i++){
+            cout << endl << "====Enter i = " << i << "=====" << endl;
             if(adjoint.M[i][i] == zero){
-                for(int k=0; k<N; k++){
+                cout << "adjoint.M[" << i << "][ " << i << " ] == zero" << endl;
+                for(int k=i+1; k<N; k++){
                     if(k==i) continue;
-                    if(adjoint.M[k][i]!=zero){
+                    if(adjoint.M[k][i] != zero){
+                        cout << "found adjoint.M[" << k << "][" << i << "] != zero" << endl;
                         int sl[1] = {k};
                         GFM sgfm = adjoint.select_rows(sl, 1);
-                        sgfm.mul_row(0, adjoint.M[i][i] / adjoint.M[k][i]);
+                        sgfm.mul_row(0, one / adjoint.M[k][i]);
+                        cout << "padding sgfm = " << endl;
+                        sgfm.show();
                         adjoint.add_row(i, &sgfm);
                         break;
                     }
                 }
             }
-
+            if(adjoint.M[i][i] == zero){
+                cout << "error padding" << endl;
+                assert(adjoint.M[i][i] == zero);
+            }
+            cout << "after padding" << endl;
+            adjoint.show();
             for(int k=0; k<N; k++){
                 if(k==i) continue;
                 if(adjoint.M[k][i] == zero) continue;
                 int sl[1] = {i};
                 GFM sgfm = adjoint.select_rows(sl, 1);
                 sgfm.mul_row(0, adjoint.M[k][i] / adjoint.M[i][i]);
-                cout << "sgfm k=" << k << endl;
+                // cout << "sgfm k=" << k << endl;
                 sgfm.show();
                 adjoint.add_row(k, &sgfm);
 
             }
 
             adjoint.mul_row(i, one/adjoint.M[i][i]);
-        
-            cout << "here " << i << endl;
+
+            cout << "i = " << i << " final" << endl;
             adjoint.show();
+            cout << "=====end of i = " << i << "=====" << endl << endl;
+
         }
 
         cout << "final" << endl;
